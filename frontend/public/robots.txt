@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /appointment
+Disallow: /login
+Disallow: /profile
+
+Sitemap: https://neurocareclinic.in/sitemap.xml

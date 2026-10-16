@@ -1,0 +1,99 @@
+{
+  "expo": {
+    "name": "Dental Health Care App",
+    "slug": "dhic-app",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "dhicapp",
+    "userInterfaceStyle": "light",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2563eb"
+    },
+
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.care.dhic"
+    },
+
+    "android": {
+      "package": "in.care.dhic",
+
+      "googleServicesFile": "./google-services.json",
+
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2563eb"
+      },
+
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+
+      [
+        "@react-native-firebase/app",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
+      ],
+
+      "@react-native-firebase/messaging",
+
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2563eb"
+        }
+      ],
+
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow DHIC to access your camera."
+        }
+      ],
+
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow DHIC to access your location."
+        }
+      ],
+
+      "@react-native-community/datetimepicker"
+    ],
+
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#2563eb"
+    },
+
+    "extra": {
+      "apiUrl": "https://api.dentalhealthcareandimplantcentre.in/api",
+      "razorpayKeyId": "rzp_test_T8XbqaXF6Hu9ea"
+    }
+  }
+}

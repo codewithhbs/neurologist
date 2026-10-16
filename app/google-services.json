@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "584934950104",
+    "project_id": "dental-health-care-66c4b",
+    "storage_bucket": "dental-health-care-66c4b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584934950104:android:8d5054d24afdb2be99c3ad",
+        "android_client_info": {
+          "package_name": "in.care.dhic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuXkSUPbtAlSzN6W3MRcyG4y4Nw3zWws8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

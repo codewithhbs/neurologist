@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nc-navy: #11417e;
+  --nc-blue: #0a75cb;
+  --nc-teal: #08a599;
+  --nc-leaf: #8dc63f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: #0f172a;
+}
+
+.container-x {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 border-2 border-brand-600 text-brand-700 hover:bg-brand-50 font-semibold px-6 py-3 rounded-lg transition-colors;
+}
+
+.btn-whatsapp {
+  @apply inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors;
+}
+
+.section-eyebrow {
+  @apply text-accent-600 font-semibold text-sm uppercase tracking-wide;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-card border border-slate-100;
+}
+
+.input-field {
+  @apply w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-800 outline-none transition-colors focus:border-brand-500;
+}
+
+/* logo-matched gradient: navy -> blue -> teal */
+.bg-brand-gradient {
+  background-image: linear-gradient(135deg, #11417e 0%, #0a75cb 55%, #08a599 100%);
+}
+
+.text-brand-gradient {
+  background-image: linear-gradient(90deg, #11417e, #0a75cb 50%, #08a599);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
