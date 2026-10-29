@@ -7,5 +7,5 @@ const PORT = process.env.PORT || 5680;
 // Schedule appointment reminders
 cron.schedule("*/5 * * * *", runAppointmentReminders); // Run every 5 minutes
 app.listen(PORT, () => {
-  console.log(`🦷 DHIC Backend running on http://localhost:${PORT}`);
+  console.log(`🦷 Backend running on http://localhost:${PORT}`);
 });

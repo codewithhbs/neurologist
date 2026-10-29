@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Dental Health Care App",
-    "slug": "dhic-app",
+    "slug": "neuro-app",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "dhicapp",
+    "scheme": "neuroapp",
     "userInterfaceStyle": "light",
 
     "splash": {
@@ -20,11 +20,11 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "in.care.dhic"
+      "bundleIdentifier": "in.care.neuro"
     },
 
     "android": {
-      "package": "in.care.dhic",
+      "package": "in.care.neuro",
 
       "googleServicesFile": "./google-services.json",
 
@@ -72,14 +72,14 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow DHIC to access your camera."
+          "cameraPermission": "Allow Neuro to access your camera."
         }
       ],
 
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow DHIC to access your location."
+          "locationWhenInUsePermission": "Allow Neuro to access your location."
         }
       ],
 

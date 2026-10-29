@@ -1,5 +1,5 @@
 {
-  "name": "dhic-backend",
+  "name": "backend",
   "version": "1.0.0",
   "description": "Neurocare Clinic - Backend API",
   "main": "src/server.js",

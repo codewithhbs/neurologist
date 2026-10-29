@@ -8,8 +8,8 @@ const API_URL = "https://api.drneerajkumarneurologist.com/api";
 
 const client = axios.create({ baseURL: API_URL, timeout: 20000 });
 
-const TOKEN_KEY = "dhic_patient_token";
-const ROLE_KEY = "dhic_active_role"; // 'patient' | 'receptionist'
+const TOKEN_KEY = "patient_token";
+const ROLE_KEY = "active_role"; // 'patient' | 'receptionist'
 
 client.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync(TOKEN_KEY);
@@ -22,7 +22,7 @@ export const setPatientToken = (token) =>
 export const getPatientToken = () => SecureStore.getItemAsync(TOKEN_KEY);
 export const clearPatientToken = () => SecureStore.deleteItemAsync(TOKEN_KEY);
 
-export const GUEST_KEY = "dhic_guest_mode";
+export const GUEST_KEY = "guest_mode";
 export const setGuestMode = (val) =>
   SecureStore.setItemAsync(GUEST_KEY, val ? "1" : "0");
 export const getGuestMode = async () =>

@@ -79,7 +79,7 @@ app.use('/api', imageUrls);
 // Serve locally-uploaded files (used when Cloudinary keys are not configured — see config/cloudinary.js)
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-app.get('/', (req, res) => res.json({ success: true, message: 'DHIC API running ✅' }));
+app.get('/', (req, res) => res.json({ success: true, message: '🚀 API running ✅' }));
 app.get('/api/health', (req, res) =>
   res.json({ success: true, status: 'ok', time: new Date(), cache: cache.isUp() ? 'redis' : 'off' })
 );

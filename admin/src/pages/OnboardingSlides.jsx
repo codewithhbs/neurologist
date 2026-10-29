@@ -46,7 +46,7 @@ export default function OnboardingSlides() {
 
   return (
     <AdminLayout title="Onboarding Slides (Mobile App)">
-      <p className="text-sm text-slate-500 mb-4">These slides appear on the first launch of the DHIC mobile app (Expo). Recommended image ratio: 3:4 portrait.</p>
+      <p className="text-sm text-slate-500 mb-4">These slides appear on the first launch of the your mobile app (Expo). Recommended image ratio: 3:4 portrait.</p>
       <div className="flex justify-end mb-4"><button onClick={openCreate} className="btn-primary"><FiPlus /> Add Slide</button></div>
 
       <DataTable

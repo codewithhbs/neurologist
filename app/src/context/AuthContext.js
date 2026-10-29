@@ -6,7 +6,7 @@ import client, {
 } from '../api/client';
 
 const AuthContext = createContext(null);
-const ONBOARDING_KEY = 'dhic_onboarding_seen';
+const ONBOARDING_KEY = 'onboarding_seen';
 
 export function AuthProvider({ children }) {
   const [patient, setPatient] = useState(null);

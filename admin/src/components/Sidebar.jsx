@@ -49,7 +49,7 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-brand-900 text-white min-h-screen sticky top-0 hidden lg:flex flex-col">
       <div className="px-5 py-5 border-b border-white/10">
-        <p className="font-bold text-lg leading-tight">DHIC Admin</p>
+        <p className="font-bold text-lg leading-tight">Admin</p>
         <p className="text-xs text-brand-200">
           Neurocare Clinic
         </p>

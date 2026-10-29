@@ -1,12 +1,7 @@
 const redisClient = require('../config/redis');
 const cache = require('../utils/cache');
 
-// POST /api/admin/cache/clear
-// Body (optional): { namespaces: ["doctors","services"], hard: true }
-//  - no body            -> invalidates ALL cache namespaces (instant, version bump)
-//  - { namespaces: [] } -> invalidates only those namespaces
-//  - { hard: true }     -> physically deletes every dhic:* key from Redis
-//                          (OTP keys use their own prefix and survive)
+
 exports.clearCache = async (req, res) => {
   try {
     if (!cache.isUp()) {

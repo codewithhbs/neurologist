@@ -6,7 +6,7 @@
 require("dotenv").config();
 const pool = require("../config/db");
 
-const DB = () => process.env.DB_NAME || "dhic_db";
+const DB = () => process.env.DB_NAME || "neurocare_db";
 
 async function tableExists(table) {
   const [r] = await pool.query(

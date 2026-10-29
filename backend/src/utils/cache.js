@@ -1,17 +1,11 @@
 const crypto = require('crypto');
 const redisClient = require('../config/redis');
 
-const PREFIX = process.env.CACHE_PREFIX || 'dhic';
+const PREFIX = process.env.CACHE_PREFIX || 'neuro';
 const DEFAULT_TTL = parseInt(process.env.CACHE_TTL || '300', 10); // seconds
 const CACHE_ENABLED = String(process.env.CACHE_ENABLED || 'true') !== 'false';
 
-/**
- * All cacheable data groups.
- * Invalidation works by bumping a *version counter* per namespace:
- *   key = dhic:doctors:v7:<hash>
- * Bumping version => every old key becomes unreachable INSTANTLY
- * (no SCAN, no DEL loop, no race conditions). Old keys die on their own TTL.
- */
+
 const NAMESPACES = [
   'doctors',
   'clinics',

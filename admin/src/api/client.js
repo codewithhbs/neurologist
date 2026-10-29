@@ -7,7 +7,7 @@ const client = axios.create({
 });
 
 client.interceptors.request.use((config) => {
-  const token = Cookies.get('dhic_admin_token');
+  const token = Cookies.get('admin_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -16,15 +16,15 @@ client.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      Cookies.remove('dhic_admin_token');
+      Cookies.remove('admin_token');
       window.location.href = '/login';
     }
     return Promise.reject(err);
   }
 );
 
-export const setAdminToken = (token) => Cookies.set('dhic_admin_token', token, { expires: 7 });
-export const getAdminToken = () => Cookies.get('dhic_admin_token');
-export const clearAdminToken = () => Cookies.remove('dhic_admin_token');
+export const setAdminToken = (token) => Cookies.set('admin_token', token, { expires: 7 });
+export const getAdminToken = () => Cookies.get('admin_token');
+export const clearAdminToken = () => Cookies.remove('admin_token');
 
 export default client;

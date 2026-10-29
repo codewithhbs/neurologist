@@ -7,7 +7,7 @@ const baseURL = 'https://api.drneerajkumarneurologist.com/api/cofounder';
 
 const cofounderClient = axios.create({ baseURL, timeout: 20000 });
 
-const KEY_STORAGE = 'dhic_cofounder_key';
+const KEY_STORAGE = 'cofounder_key';
 
 export const getCofounderKey = () => localStorage.getItem(KEY_STORAGE) || 'ffac91a027c9ea9ba08c80cb2b33ce42d1dff4dfadcde7eb7df560243c9c6562';
 export const setCofounderKey = (key) => localStorage.setItem(KEY_STORAGE, key);

@@ -34,7 +34,7 @@ if (hasCloudinaryKeys) {
   const storage = new CloudinaryStorage({
     cloudinary,
     params: async (req, file) => ({
-      folder: `dhic/${req.uploadFolder || 'misc'}`,
+      folder: `uploads/${req.uploadFolder || 'misc'}`,
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
       transformation: [{ quality: 'auto', fetch_format: 'auto' }]
     })
