@@ -23,7 +23,9 @@ import {
   PrescriptionForm,
 } from "../../src/components/MedicalForms";
 
-const API_BASE_URL = "http://192.168.1.38:5680";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL
+  ? process.env.EXPO_PUBLIC_API_URL.replace(/\/api\/?$/, "")
+  : "https://api.drneerajkumarneurologist.com";
 
 // ---------------------------------------------------------
 // URL HELPER

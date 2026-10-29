@@ -4,7 +4,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const client = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3021/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.drneerajkumarneurologist.com/api'
 });
 
 client.interceptors.request.use((config) => {

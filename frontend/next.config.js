@@ -3,17 +3,17 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'res.cloudinary.com' },
-      { protocol: 'https', hostname: 'i.ibb.co' },
-      { protocol: 'http', hostname: 'localhost' },
-      { protocol: 'https', hostname: 'images.unsplash.com' }
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' }
     ]
   },
   async rewrites() {
+    const rawApi = process.env.NEXT_PUBLIC_API_URL || 'https://api.drneerajkumarneurologist.com/api';
+    const apiUrl = rawApi.replace(/\/+$/, '');
     return [
       {
         source: '/api/backend/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`
+        destination: `${apiUrl}/:path*`
       }
     ];
   }

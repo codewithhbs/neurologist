@@ -1,13 +1,15 @@
 -- ============================================================
--- Neurocare Clinic - Full Schema (MySQL)
--- Run on XAMPP MariaDB: mysql -u root -p < schema.sql
+-- Neurocare Clinic - Full Production Schema (MySQL / MariaDB)
+-- Run: mysql -u root -p < schema.sql
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS neurocare_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE neurocare_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ---------------- ADMIN USERS ----------------
-CREATE TABLE admin_users (
+CREATE TABLE IF NOT EXISTS admin_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   email VARCHAR(150) NOT NULL UNIQUE,
@@ -20,7 +22,7 @@ CREATE TABLE admin_users (
 );
 
 -- ---------------- CLINICS (multi-clinic support) ----------------
-CREATE TABLE clinics (
+CREATE TABLE IF NOT EXISTS clinics (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   slug VARCHAR(160) NOT NULL UNIQUE,
@@ -42,7 +44,7 @@ CREATE TABLE clinics (
 );
 
 -- ---------------- CLINIC HOLIDAYS/LEAVES ----------------
-CREATE TABLE clinic_holidays (
+CREATE TABLE IF NOT EXISTS clinic_holidays (
   id INT AUTO_INCREMENT PRIMARY KEY,
   clinic_id INT NOT NULL,
   holiday_date DATE NOT NULL,
@@ -53,7 +55,7 @@ CREATE TABLE clinic_holidays (
 );
 
 -- ---------------- DOCTORS ----------------
-CREATE TABLE doctors (
+CREATE TABLE IF NOT EXISTS doctors (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   slug VARCHAR(170) NOT NULL UNIQUE,
@@ -62,9 +64,9 @@ CREATE TABLE doctors (
   bio TEXT,
   experience_years INT DEFAULT 0,
   rating DECIMAL(2,1) DEFAULT 4.8,
-  photo_url VARCHAR(500), -- cloudinary
+  photo_url VARCHAR(500),
   registration_no VARCHAR(100),
-  consultation_fee DECIMAL(10,2) DEFAULT 0, -- single fee used for all bookings with this doctor
+  consultation_fee DECIMAL(10,2) DEFAULT 0,
   is_active TINYINT(1) DEFAULT 1,
   meta_title VARCHAR(200),
   meta_description VARCHAR(500),
@@ -73,11 +75,11 @@ CREATE TABLE doctors (
 );
 
 -- doctor <-> clinic mapping with per-clinic weekly availability
-CREATE TABLE doctor_clinics (
+CREATE TABLE IF NOT EXISTS doctor_clinics (
   id INT AUTO_INCREMENT PRIMARY KEY,
   doctor_id INT NOT NULL,
   clinic_id INT NOT NULL,
-  weekly_availability JSON, -- {"mon":[["10:00","14:00"]],"tue":[...],... "sun":[]}
+  weekly_availability JSON,
   is_active TINYINT(1) DEFAULT 1,
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
   FOREIGN KEY (clinic_id) REFERENCES clinics(id) ON DELETE CASCADE,
@@ -85,24 +87,24 @@ CREATE TABLE doctor_clinics (
 );
 
 -- doctor-wise leaves (separate from clinic holidays)
-CREATE TABLE doctor_leaves (
+CREATE TABLE IF NOT EXISTS doctor_leaves (
   id INT AUTO_INCREMENT PRIMARY KEY,
   doctor_id INT NOT NULL,
   leave_date DATE NOT NULL,
-  clinic_id INT NULL, -- null = leave at all clinics
+  clinic_id INT NULL,
   reason VARCHAR(200),
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
   FOREIGN KEY (clinic_id) REFERENCES clinics(id) ON DELETE CASCADE
 );
 
--- block a specific time window (not the whole day) for a doctor
-CREATE TABLE doctor_slot_blocks (
+-- block a specific time window for a doctor
+CREATE TABLE IF NOT EXISTS doctor_slot_blocks (
   id INT AUTO_INCREMENT PRIMARY KEY,
   doctor_id INT NOT NULL,
-  clinic_id INT NULL, -- null = blocked at all clinics
+  clinic_id INT NULL,
   block_date DATE NOT NULL,
   start_time TIME NOT NULL,
-  end_time TIME NOT NULL, -- exclusive; any generated slot start >= start_time AND < end_time is hidden
+  end_time TIME NOT NULL,
   reason VARCHAR(200),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
@@ -111,7 +113,7 @@ CREATE TABLE doctor_slot_blocks (
 );
 
 -- ---------------- SERVICE CATEGORIES & SERVICES ----------------
-CREATE TABLE service_categories (
+CREATE TABLE IF NOT EXISTS service_categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   slug VARCHAR(140) NOT NULL UNIQUE,
@@ -120,18 +122,18 @@ CREATE TABLE service_categories (
   is_active TINYINT(1) DEFAULT 1
 );
 
-CREATE TABLE services (
+CREATE TABLE IF NOT EXISTS services (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category_id INT NULL,
   name VARCHAR(150) NOT NULL,
   slug VARCHAR(170) NOT NULL UNIQUE,
   short_description VARCHAR(500),
-  description LONGTEXT, -- rich HTML for detail page
+  description LONGTEXT,
   icon_url VARCHAR(500),
   banner_image_url VARCHAR(500),
-  base_price DECIMAL(10,2) DEFAULT 0, -- fallback if no doctor-specific fee
+  base_price DECIMAL(10,2) DEFAULT 0,
   duration_minutes INT DEFAULT 30,
-  faqs_json JSON, -- [{"q":"","a":""}]
+  faqs_json JSON,
   is_featured TINYINT(1) DEFAULT 0,
   is_active TINYINT(1) DEFAULT 1,
   display_order INT DEFAULT 0,
@@ -143,46 +145,108 @@ CREATE TABLE services (
 );
 
 -- doctor-wise fee override per service
-CREATE TABLE doctor_services (
+CREATE TABLE IF NOT EXISTS doctor_services (
   id INT AUTO_INCREMENT PRIMARY KEY,
   doctor_id INT NOT NULL,
   service_id INT NOT NULL,
   fee DECIMAL(10,2) NOT NULL,
-  duration_minutes INT DEFAULT NULL, -- override service default duration
+  duration_minutes INT DEFAULT NULL,
   is_active TINYINT(1) DEFAULT 1,
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
   FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
   UNIQUE KEY uniq_doctor_service (doctor_id, service_id)
 );
 
--- ---------------- PATIENTS ----------------
-CREATE TABLE patients (
+-- ---------------- RECEPTIONISTS STAFF ----------------
+CREATE TABLE IF NOT EXISTS receptionists (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(150),
+  name VARCHAR(120) NOT NULL,
   mobile VARCHAR(15) NOT NULL UNIQUE,
+  clinic_id INT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  last_login DATETIME NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (clinic_id) REFERENCES clinics(id) ON DELETE SET NULL
+);
+
+-- ---------------- PATIENTS ----------------
+CREATE TABLE IF NOT EXISTS patients (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  parent_patient_id INT NULL,
+  relation VARCHAR(40) NULL,
+  patient_id VARCHAR(50) NULL UNIQUE,
+  name VARCHAR(150),
+  father_husband_name VARCHAR(150) NULL,
+  mobile VARCHAR(15) NOT NULL,
   email VARCHAR(150),
   gender ENUM('male','female','other') NULL,
   dob DATE NULL,
+  nationality VARCHAR(80) NULL DEFAULT 'Indian',
+  marital_status VARCHAR(40) NULL,
   address TEXT,
+  permanent_address TEXT,
+  permanent_pincode VARCHAR(12),
+  local_address TEXT,
+  local_pincode VARCHAR(12),
+  referred_by VARCHAR(100),
+  referrer_name VARCHAR(150),
+  referrer_address TEXT,
+  consent_date DATETIME NULL,
   is_active TINYINT(1) DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_patients_mobile (mobile),
+  INDEX idx_patients_mobile_parent (mobile, parent_patient_id),
+  INDEX idx_parent_patient (parent_patient_id),
+  FOREIGN KEY (parent_patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
 
--- ---------------- OTP ----------------
-CREATE TABLE otp_requests (
+-- ---------------- NEW PATINET (Offline / Backdated Patient Records) ----------------
+CREATE TABLE IF NOT EXISTS new_patinet (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  parent_patient_id INT NULL,
+  relation VARCHAR(40) NULL,
+  patient_id VARCHAR(50) NULL UNIQUE,
+  name VARCHAR(150),
+  father_husband_name VARCHAR(150) NULL,
+  mobile VARCHAR(15) NOT NULL,
+  email VARCHAR(150),
+  gender ENUM('male','female','other') NULL,
+  dob DATE NULL,
+  nationality VARCHAR(80) NULL DEFAULT 'Indian',
+  marital_status VARCHAR(40) NULL,
+  address TEXT,
+  permanent_address TEXT,
+  permanent_pincode VARCHAR(12),
+  local_address TEXT,
+  local_pincode VARCHAR(12),
+  referred_by VARCHAR(100),
+  referrer_name VARCHAR(150),
+  referrer_address TEXT,
+  consent_date DATETIME NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_np_mobile (mobile),
+  INDEX idx_np_mobile_parent (mobile, parent_patient_id),
+  INDEX idx_np_parent (parent_patient_id)
+);
+
+-- ---------------- OTP REQUESTS ----------------
+CREATE TABLE IF NOT EXISTS otp_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   mobile VARCHAR(15) NOT NULL,
   otp_code VARCHAR(10) NOT NULL,
-  purpose ENUM('login','booking') DEFAULT 'login',
+  purpose ENUM('login','booking','reception_login') DEFAULT 'login',
   is_used TINYINT(1) DEFAULT 0,
   expires_at DATETIME NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_mobile (mobile)
+  INDEX idx_otp_mobile (mobile)
 );
 
 -- ---------------- COUPONS / OFFERS ----------------
-CREATE TABLE coupons (
+CREATE TABLE IF NOT EXISTS coupons (
   id INT AUTO_INCREMENT PRIMARY KEY,
   code VARCHAR(50) NOT NULL UNIQUE,
   title VARCHAR(200),
@@ -191,18 +255,17 @@ CREATE TABLE coupons (
   discount_value DECIMAL(10,2) NOT NULL,
   max_discount DECIMAL(10,2) NULL,
   min_amount DECIMAL(10,2) DEFAULT 0,
-  usage_limit INT NULL, -- total uses allowed, null = unlimited
+  usage_limit INT NULL,
   used_count INT DEFAULT 0,
   per_patient_limit INT DEFAULT 1,
-  applicable_service_ids JSON NULL, -- null = all services
+  applicable_service_ids JSON NULL,
   valid_from DATE NULL,
   valid_till DATE NULL,
   is_active TINYINT(1) DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- offers (marketing banners, may or may not link to coupon)
-CREATE TABLE offers (
+CREATE TABLE IF NOT EXISTS offers (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
   slug VARCHAR(220) NOT NULL UNIQUE,
@@ -217,9 +280,9 @@ CREATE TABLE offers (
 );
 
 -- ---------------- APPOINTMENTS ----------------
-CREATE TABLE appointments (
+CREATE TABLE IF NOT EXISTS appointments (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  appointment_code VARCHAR(30) NOT NULL UNIQUE, -- e.g. APP2410S21001
+  appointment_code VARCHAR(30) NOT NULL UNIQUE,
   patient_id INT NOT NULL,
   clinic_id INT NOT NULL,
   doctor_id INT NOT NULL,
@@ -233,12 +296,19 @@ CREATE TABLE appointments (
   final_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
   is_free TINYINT(1) DEFAULT 0,
   payment_status ENUM('not_required','pending','paid','failed','refunded') DEFAULT 'pending',
+  payment_method VARCHAR(50) DEFAULT 'pending',
   status ENUM('pending','confirmed','completed','cancelled','no_show') DEFAULT 'pending',
   reason VARCHAR(500),
   notes TEXT,
   cancelled_reason VARCHAR(300),
-  booked_via ENUM('website','admin','phone') DEFAULT 'website',
+  booked_via ENUM('website','admin','phone','reception') DEFAULT 'website',
   created_by_receptionist_id INT NULL,
+  checked_in_at DATETIME NULL,
+  checked_out_at DATETIME NULL,
+  timer_minutes INT NULL,
+  visit_duration_minutes INT NULL,
+  checked_in_by INT NULL,
+  checked_out_by INT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
@@ -247,11 +317,50 @@ CREATE TABLE appointments (
   FOREIGN KEY (service_id) REFERENCES services(id),
   FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE SET NULL,
   FOREIGN KEY (created_by_receptionist_id) REFERENCES receptionists(id) ON DELETE SET NULL,
-  -- prevent double booking: same doctor+clinic+date+start_time can only be booked once (excluding cancelled)
-  UNIQUE KEY uniq_doctor_slot (doctor_id, clinic_id, appointment_date, start_time)
+  UNIQUE KEY uniq_doctor_slot (doctor_id, clinic_id, appointment_date, start_time),
+  INDEX idx_appt_date (appointment_date),
+  INDEX idx_appt_status (status),
+  INDEX idx_appt_patient (patient_id),
+  INDEX idx_appt_checked_in (checked_in_at)
 );
 
-CREATE TABLE coupon_usages (
+-- ---------------- OLD APPOINTMENTS (Historical/Backdated Records) ----------------
+CREATE TABLE IF NOT EXISTS old_appointments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  appointment_code VARCHAR(30) NOT NULL UNIQUE,
+  patient_id INT NOT NULL,
+  clinic_id INT NOT NULL,
+  doctor_id INT NOT NULL,
+  service_id INT NULL,
+  appointment_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  fee_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  discount_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  coupon_id INT NULL,
+  final_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  is_free TINYINT(1) DEFAULT 0,
+  payment_status ENUM('not_required','pending','paid','failed','refunded') DEFAULT 'pending',
+  payment_method VARCHAR(50) DEFAULT 'pending',
+  status ENUM('pending','confirmed','completed','cancelled','no_show') DEFAULT 'pending',
+  reason VARCHAR(500),
+  notes TEXT,
+  cancelled_reason VARCHAR(300),
+  booked_via ENUM('website','admin','phone','reception') DEFAULT 'website',
+  created_by_receptionist_id INT NULL,
+  checked_in_at DATETIME NULL,
+  checked_out_at DATETIME NULL,
+  timer_minutes INT NULL,
+  visit_duration_minutes INT NULL,
+  checked_in_by INT NULL,
+  checked_out_by INT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_old_appt_date (appointment_date),
+  INDEX idx_old_appt_patient (patient_id)
+);
+
+CREATE TABLE IF NOT EXISTS coupon_usages (
   id INT AUTO_INCREMENT PRIMARY KEY,
   coupon_id INT NOT NULL,
   patient_id INT NOT NULL,
@@ -262,8 +371,8 @@ CREATE TABLE coupon_usages (
   FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
 );
 
--- ---------------- PAYMENTS (Razorpay) ----------------
-CREATE TABLE payments (
+-- ---------------- PAYMENTS (Razorpay & Cash) ----------------
+CREATE TABLE IF NOT EXISTS payments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   appointment_id INT NOT NULL,
   patient_id INT NOT NULL,
@@ -273,16 +382,18 @@ CREATE TABLE payments (
   amount DECIMAL(10,2) NOT NULL,
   currency VARCHAR(10) DEFAULT 'INR',
   method VARCHAR(30),
+  collected_by_receptionist_id INT NULL,
   status ENUM('created','paid','failed','refunded') DEFAULT 'created',
   raw_response JSON NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
-  FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+  FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+  FOREIGN KEY (collected_by_receptionist_id) REFERENCES receptionists(id) ON DELETE SET NULL
 );
 
 -- ---------------- MEDICAL HISTORY / PRESCRIPTIONS / FOLLOW-UPS ----------------
-CREATE TABLE medical_history (
+CREATE TABLE IF NOT EXISTS medical_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
   appointment_id INT NULL,
@@ -290,7 +401,7 @@ CREATE TABLE medical_history (
   title VARCHAR(200),
   diagnosis TEXT,
   treatment_notes TEXT,
-  attachment_urls JSON NULL, -- cloudinary array
+  attachment_urls JSON NULL,
   visit_date DATE NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
@@ -298,15 +409,29 @@ CREATE TABLE medical_history (
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
 );
 
-CREATE TABLE prescriptions (
+CREATE TABLE IF NOT EXISTS old_medical_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
   appointment_id INT NULL,
   doctor_id INT NULL,
-  medicines_json JSON, -- [{"name":"","dosage":"","duration":"","instructions":""}]
+  title VARCHAR(200),
+  diagnosis TEXT,
+  treatment_notes TEXT,
+  attachment_urls JSON NULL,
+  visit_date DATE NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_old_med_patient (patient_id)
+);
+
+CREATE TABLE IF NOT EXISTS prescriptions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  patient_id INT NOT NULL,
+  appointment_id INT NULL,
+  doctor_id INT NULL,
+  medicines_json JSON,
   notes TEXT,
   pdf_url VARCHAR(500),
-  attachment_urls JSON NULL, -- images/pdf clicked+uploaded by receptionist, e.g. ["https://.../1.jpg"]
+  attachment_urls JSON NULL,
   prescribed_date DATE NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
@@ -314,7 +439,21 @@ CREATE TABLE prescriptions (
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
 );
 
-CREATE TABLE follow_ups (
+CREATE TABLE IF NOT EXISTS old_prescriptions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  patient_id INT NOT NULL,
+  appointment_id INT NULL,
+  doctor_id INT NULL,
+  medicines_json JSON,
+  notes TEXT,
+  pdf_url VARCHAR(500),
+  attachment_urls JSON NULL,
+  prescribed_date DATE NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_old_presc_patient (patient_id)
+);
+
+CREATE TABLE IF NOT EXISTS follow_ups (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
   appointment_id INT NULL,
@@ -328,14 +467,24 @@ CREATE TABLE follow_ups (
   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE SET NULL
 );
 
+-- ---------------- APPOINTMENT REMINDERS (automated 2hr / 30min jobs) ----------------
+CREATE TABLE IF NOT EXISTS appointment_reminders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  appointment_id INT NOT NULL,
+  reminder_type VARCHAR(20) NOT NULL,
+  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_appt_reminder (appointment_id, reminder_type)
+);
+
 -- ---------------- REVIEWS ----------------
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NULL,
   doctor_id INT NULL,
   clinic_id INT NULL,
   patient_name VARCHAR(150) NOT NULL,
-  rating TINYINT NOT NULL, -- 1-5
+  rating TINYINT NOT NULL,
   review_text TEXT,
   is_approved TINYINT(1) DEFAULT 0,
   is_featured TINYINT(1) DEFAULT 0,
@@ -347,13 +496,13 @@ CREATE TABLE reviews (
 );
 
 -- ---------------- BLOGS ----------------
-CREATE TABLE blog_categories (
+CREATE TABLE IF NOT EXISTS blog_categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   slug VARCHAR(140) NOT NULL UNIQUE
 );
 
-CREATE TABLE blogs (
+CREATE TABLE IF NOT EXISTS blogs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category_id INT NULL,
   title VARCHAR(250) NOT NULL,
@@ -373,7 +522,7 @@ CREATE TABLE blogs (
 );
 
 -- ---------------- INVENTORY: MEDICINES & EQUIPMENT ----------------
-CREATE TABLE medicines (
+CREATE TABLE IF NOT EXISTS medicines (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(200) NOT NULL,
   category VARCHAR(120),
@@ -389,7 +538,7 @@ CREATE TABLE medicines (
   FOREIGN KEY (clinic_id) REFERENCES clinics(id) ON DELETE SET NULL
 );
 
-CREATE TABLE equipment (
+CREATE TABLE IF NOT EXISTS equipment (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(200) NOT NULL,
   category VARCHAR(120),
@@ -406,7 +555,7 @@ CREATE TABLE equipment (
 );
 
 -- ---------------- CMS / SETTINGS / SEO ----------------
-CREATE TABLE site_settings (
+CREATE TABLE IF NOT EXISTS site_settings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   setting_key VARCHAR(100) NOT NULL UNIQUE,
   setting_value LONGTEXT,
@@ -414,21 +563,21 @@ CREATE TABLE site_settings (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE cms_pages (
+CREATE TABLE IF NOT EXISTS cms_pages (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  page_key VARCHAR(100) NOT NULL UNIQUE, -- 'home','about','contact' etc
+  page_key VARCHAR(100) NOT NULL UNIQUE,
   title VARCHAR(200),
-  content_json JSON, -- flexible section blocks
+  content_json JSON,
   meta_title VARCHAR(200),
   meta_description VARCHAR(500),
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE seo_meta (
+CREATE TABLE IF NOT EXISTS seo_meta (
   id INT AUTO_INCREMENT PRIMARY KEY,
   entity_type ENUM('service','doctor','blog','clinic','custom') NOT NULL,
   entity_id INT NULL,
-  path VARCHAR(300) NULL, -- for custom paths
+  path VARCHAR(300) NULL,
   meta_title VARCHAR(200),
   meta_description VARCHAR(500),
   og_image VARCHAR(500),
@@ -438,7 +587,7 @@ CREATE TABLE seo_meta (
 );
 
 -- ---------------- HERO BANNERS (homepage banner slider) ----------------
-CREATE TABLE hero_banners (
+CREATE TABLE IF NOT EXISTS hero_banners (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200),
   subtitle VARCHAR(500),
@@ -453,71 +602,30 @@ CREATE TABLE hero_banners (
 );
 
 -- ---------------- ONBOARDING SLIDES (mobile app) ----------------
-CREATE TABLE onboarding_slides (
+CREATE TABLE IF NOT EXISTS onboarding_slides (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
   subtitle VARCHAR(500),
-  image_url VARCHAR(500) NOT NULL, -- cloudinary
+  image_url VARCHAR(500) NOT NULL,
   display_order INT DEFAULT 0,
   is_active TINYINT(1) DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS receptionists (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(120) NOT NULL,
-  mobile VARCHAR(15) NOT NULL UNIQUE,
-  clinic_id INT NULL,
-  is_active TINYINT(1) DEFAULT 1,
-  last_login DATETIME NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (clinic_id) REFERENCES clinics(id) ON DELETE SET NULL
-);
- 
-ALTER TABLE appointments MODIFY booked_via ENUM('website','admin','phone','reception') DEFAULT 'website';
- 
-ALTER TABLE payments ADD COLUMN collected_by_receptionist_id INT NULL AFTER method,
-ADD FOREIGN KEY (collected_by_receptionist_id) REFERENCES receptionists(id) ON DELETE SET NULL;
- 
-ALTER TABLE otp_requests MODIFY purpose ENUM('login','booking','reception_login') DEFAULT 'login';
-
--- receptionist dashboard: track which receptionist booked which appointment (cash/booking count per person)
-ALTER TABLE appointments ADD COLUMN created_by_receptionist_id INT NULL AFTER booked_via,
-ADD FOREIGN KEY (created_by_receptionist_id) REFERENCES receptionists(id) ON DELETE SET NULL;
-
--- prescriptions: allow uploading a photo (not just pdf) of the handwritten/printed prescription
-ALTER TABLE prescriptions ADD COLUMN attachment_urls JSON NULL AFTER pdf_url;
- 
-
--- ---------------- INDEXES for performance ----------------
-CREATE INDEX idx_appt_date ON appointments(appointment_date);
-CREATE INDEX idx_appt_status ON appointments(status);
-CREATE INDEX idx_appt_patient ON appointments(patient_id);
+-- ---------------- INDEXES FOR PERFORMANCE ----------------
 CREATE INDEX idx_doctor_active ON doctors(is_active);
 CREATE INDEX idx_service_active ON services(is_active);
 CREATE INDEX idx_blog_published ON blogs(is_published, published_at);
 CREATE INDEX idx_review_approved ON reviews(is_approved);
--- ============================================================
--- FAMILY MEMBERS + RECEPTION IN/OUT TIMER
--- (for an existing DB just run: node src/migrations/familyAndVisitTimer.js)
--- ============================================================
--- A family member = patients row with parent_patient_id = holder id and the SAME mobile.
--- ALTER TABLE patients DROP INDEX mobile;   -- mobile is no longer unique (shared by family)
--- ALTER TABLE patients
---   ADD COLUMN parent_patient_id INT NULL AFTER id,
---   ADD COLUMN relation VARCHAR(40) NULL AFTER parent_patient_id,
---   ADD INDEX idx_parent_patient (parent_patient_id),
---   ADD INDEX idx_mobile_parent (mobile, parent_patient_id);
--- (same two columns + indexes on new_patinet)
---
--- ALTER TABLE appointments
---   ADD COLUMN checked_in_at DATETIME NULL,
---   ADD COLUMN checked_out_at DATETIME NULL,
---   ADD COLUMN timer_minutes INT NULL,
---   ADD COLUMN visit_duration_minutes INT NULL,
---   ADD COLUMN checked_in_by INT NULL,
---   ADD COLUMN checked_out_by INT NULL,
---   ADD INDEX idx_appt_checked_in (checked_in_at);
--- INSERT INTO site_settings (setting_key, setting_value, setting_type) VALUES ('visit_timer_minutes','40','text');
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------- DEFAULT SITE SETTINGS ----------------
+INSERT INTO site_settings (setting_key, setting_value, setting_type)
+VALUES
+  ('visit_timer_minutes', '40', 'text'),
+  ('clinic_name', 'Neurocare Clinic', 'text'),
+  ('contact_phone', '7042564433', 'text'),
+  ('contact_email', 'neurocareclinic@gmail.com', 'text')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);

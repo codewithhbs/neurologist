@@ -4,15 +4,32 @@ const pool = require('../config/db');
 const { sendMail, appointmentConfirmationHtml } = require('../utils/mailer');
 require('dotenv').config();
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+let razorpayInstance = null;
+function getRazorpay() {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+  if (!key_id || !key_secret || key_id.includes('xxxx') || key_id.includes('your_')) {
+    throw new Error('Razorpay keys (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are not properly configured');
+  }
+  if (!razorpayInstance) {
+    razorpayInstance = new Razorpay({ key_id, key_secret });
+  }
+  return razorpayInstance;
+}
 
 // POST /api/payments/create-order  { appointment_id }  (patient auth)
 exports.createOrder = async (req, res) => {
   try {
     const { appointment_id } = req.body;
+
+    let razorpay;
+    try {
+      razorpay = getRazorpay();
+    } catch (rzpErr) {
+      console.warn('[Payment] Razorpay not configured:', rzpErr.message);
+      return res.status(503).json({ success: false, message: rzpErr.message });
+    }
+
     // holder can pay for own + family members' appointments
     const [rows] = await pool.query(
       `SELECT a.* FROM appointments a JOIN patients p ON p.id = a.patient_id
@@ -49,8 +66,8 @@ exports.createOrder = async (req, res) => {
       appointment_code: appt.appointment_code
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Failed to create payment order' });
+    console.error('Create order error:', err);
+    res.status(500).json({ success: false, message: err.message || 'Failed to create payment order' });
   }
 };
 
@@ -59,8 +76,13 @@ exports.verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret) {
+      return res.status(503).json({ success: false, message: 'RAZORPAY_KEY_SECRET is not configured' });
+    }
+
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', keySecret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
@@ -101,7 +123,7 @@ exports.verifyPayment = async (req, res) => {
 
     res.json({ success: true, message: 'Payment verified successfully', appointment: appt });
   } catch (err) {
-    console.error(err);
+    console.error('Verify payment error:', err);
     res.status(500).json({ success: false, message: 'Payment verification failed' });
   }
 };
@@ -161,7 +183,6 @@ exports.adminGetAllPayments = async (req, res) => {
 };
 
 // POST /api/admin/appointments/:id/collect-payment { method }  -- collect cash/card/upi at clinic desk
-// method: 'cash' | 'card' | 'upi'
 exports.adminCollectPayment = async (req, res) => {
   try {
     const appointmentId = req.params.id;
@@ -195,7 +216,7 @@ exports.adminCollectPayment = async (req, res) => {
 
     res.json({ success: true, message: 'Payment collected & marked paid' });
   } catch (err) {
-    console.error(err);
+    console.error('Collect payment error:', err);
     res.status(500).json({ success: false, message: 'Failed to collect payment' });
   }
 };

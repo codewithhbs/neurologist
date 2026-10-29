@@ -22,39 +22,75 @@ app.set('trust proxy', 1);
 
 const clientUrls = (process.env.CLIENT_URL || "")
   .split(",")
-  .map(url => url.trim())
+  .map((url) => url.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
 const adminUrls = (process.env.ADMIN_URL || "")
   .split(",")
-  .map(url => url.trim())
+  .map((url) => url.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
-const allowedOrigins = [...clientUrls, ...adminUrls];
+const defaultOrigins = [
+  "https://drneerajkumarneurologist.com",
+  "https://www.drneerajkumarneurologist.com",
+  "https://admin.drneerajkumarneurologist.com",
+  "https://api.drneerajkumarneurologist.com",
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3028",
+  "http://localhost:5173",
+  "http://localhost:5000",
+];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...clientUrls, ...adminUrls]));
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without Origin header
-      // e.g. Postman, server-to-server requests
+      // Allow requests without Origin header (e.g. Postman, mobile apps, server-to-server)
       if (!origin) {
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin)) {
+      const cleanOrigin = origin.replace(/\/+$/, "");
+
+      // In development or when explicitly allowed, accept localhost on any port
+      if (process.env.NODE_ENV !== "production" && /^http:\/\/localhost(:\d+)?$/.test(cleanOrigin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      // Check exact match in configured list
+      if (allowedOrigins.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+
+      // Check domain match ignoring www
+      const isAllowed = allowedOrigins.some((allowed) => {
+        try {
+          const uAllowed = new URL(allowed);
+          const uOrigin = new URL(cleanOrigin);
+          const hAllowed = uAllowed.hostname.replace(/^www\./, "");
+          const hOrigin = uOrigin.hostname.replace(/^www\./, "");
+          return hAllowed === hOrigin && uAllowed.protocol === uOrigin.protocol;
+        } catch (_) {
+          return false;
+        }
+      });
+
+      if (isAllowed) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS] Rejected origin: ${origin}`);
+      return callback(null, false);
     },
-    credentials: true
+    credentials: true,
   })
 );
+
 app.use(morgan('dev'));
 
 // Never let the browser / Next.js fetch cache / CDN hold an old API response.
-// Redis handles the speed server-side, so this costs nothing and guarantees
-// that an admin edit is visible on the very next request.
 app.use('/api', noStore);
 
 // Razorpay webhook needs raw body BEFORE json parser
@@ -96,7 +132,7 @@ app.use((req, res) => res.status(404).json({ success: false, message: 'Route not
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err.stack || err);
   res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
 });
 

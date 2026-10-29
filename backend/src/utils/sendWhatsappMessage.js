@@ -4,7 +4,7 @@ const WAPP_API_URL = process.env.WAPP_API_URL;
 const WAPP_API_TOKEN = process.env.WAPP_API_TOKEN;
 const WAPP_ADMIN_PHONE_NUMBER = process.env.WAPP_ADMIN_PHONE_NUMBER;
 const WAPP_COUNTRY = process.env.WAPP_COUNTRY || "IN";
-const BRAND_NAME = process.env.BRAND_NAME || "Dentah Health & Care";
+const BRAND_NAME = process.env.BRAND_NAME || "Dr Neeraj Kumar Neurologist";
 
 const AUTO_REPLY_NOTE = "_This is an automated message. Please do not reply._";
 
@@ -26,6 +26,16 @@ const normalizeMobile = (mobile) => {
 
 const sendWhatsappMessage = async (to, message, options = {}) => {
   try {
+    if (!WAPP_API_URL || !WAPP_API_TOKEN) {
+      console.warn(`[WhatsApp] Skipped: WAPP_API_URL or WAPP_API_TOKEN not set (recipient: ${to})`);
+      return { success: false, skipped: true };
+    }
+
+    if (!to) {
+      console.warn("[WhatsApp] Skipped: missing recipient phone number");
+      return { success: false, skipped: true };
+    }
+
     if (!message || !message.trim()) {
       throw new Error("WhatsApp message cannot be blank");
     }
@@ -55,16 +65,15 @@ const sendWhatsappMessage = async (to, message, options = {}) => {
       );
     }
 
-    console.log("WhatsApp message sent:");
-
+    console.log(`[WhatsApp] Message successfully sent to ${mobile}`);
     return data;
   } catch (error) {
-    console.error("Error sending WhatsApp message:", {
+    console.error("[WhatsApp] Error sending message:", {
       to,
       message: error.message,
       response: error.response?.data,
     });
-    throw error;
+    return { success: false, error: error.message };
   }
 };
 
@@ -150,6 +159,9 @@ const sendNewBookingAdminWhatsapp = async ({
   date,
   time,
 }) => {
+  if (!WAPP_ADMIN_PHONE_NUMBER) {
+    return { success: false, skipped: true };
+  }
   const message =
     `🔔 *New Appointment Booking*\n\n` +
     `Customer: ${customerName}\n` +
@@ -171,6 +183,9 @@ const sendContactFormAdminWhatsapp = async ({
   subject,
   message: contactMessage,
 }) => {
+  if (!WAPP_ADMIN_PHONE_NUMBER) {
+    return { success: false, skipped: true };
+  }
   const message =
     `📩 *New Contact Form Submission*\n\n` +
     `Name: ${name}\n` +

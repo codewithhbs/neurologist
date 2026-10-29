@@ -18,7 +18,9 @@ import Button from "../../src/components/Button";
 import { FamilyManager } from "../../src/components/FamilyMembers";
 import { relationLabel } from "../../src/utils/family";
 
-const API_BASE = "https://api.drneerajkumarneurologist.com";
+const API_BASE = process.env.EXPO_PUBLIC_API_URL
+  ? process.env.EXPO_PUBLIC_API_URL.replace(/\/api\/?$/, "")
+  : "https://api.drneerajkumarneurologist.com";
 
 const TABS = [
   ["appointments", "Appts", "calendar-outline"],

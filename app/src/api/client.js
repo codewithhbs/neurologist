@@ -1,10 +1,11 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
+export const API_URL_DEV = process.env.EXPO_PUBLIC_API_URL
+  ? process.env.EXPO_PUBLIC_API_URL.replace(/\/api\/?$/, "") + "/"
+  : "https://api.drneerajkumarneurologist.com/";
 
-export const API_URL_DEV = "https://api.drneerajkumarneurologist.com/";
-
-const API_URL = "https://api.drneerajkumarneurologist.com/api";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://api.drneerajkumarneurologist.com/api";
 
 const client = axios.create({ baseURL: API_URL, timeout: 20000 });
 

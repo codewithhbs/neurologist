@@ -1,32 +1,53 @@
 const { createClient } = require('redis');
 require('dotenv').config();
 
-const redisClient = createClient({
-  url: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
-  socket: {
-    // keep trying to come back if Redis restarts, instead of dying silently
-    reconnectStrategy: (retries) => {
-      if (retries > 20) {
-        console.error('❌ Redis: giving up after 20 reconnect attempts (running without cache).');
-        return false;
+const isCacheEnabled = String(process.env.CACHE_ENABLED || 'true') !== 'false';
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+
+let redisClient = null;
+
+if (isCacheEnabled) {
+  redisClient = createClient({
+    url: redisUrl,
+    socket: {
+      reconnectStrategy: (retries) => {
+        if (retries > 5) {
+          console.warn('⚠️  Redis: giving up after 5 reconnect attempts (running safely without cache).');
+          return false;
+        }
+        return Math.min(retries * 200, 2000);
       }
-      return Math.min(retries * 200, 3000);
     }
-  }
-});
+  });
 
-redisClient.on('error', (err) => console.error('❌ Redis error:', err.message));
-redisClient.on('connect', () => console.log('✅ Redis connected'));
-redisClient.on('reconnecting', () => console.log('… Redis reconnecting'));
-redisClient.on('ready', () => console.log('✅ Redis ready — caching enabled'));
-redisClient.on('end', () => console.log('⚠️  Redis connection closed — falling back to direct DB reads'));
+  redisClient.on('error', (err) => {
+    // Log once without spamming
+    if (process.env.DEBUG_REDIS === 'true') {
+      console.warn('⚠️  Redis warning:', err.message);
+    }
+  });
+  redisClient.on('connect', () => console.log('✅ Redis connected'));
+  redisClient.on('ready', () => console.log('✅ Redis ready — caching enabled'));
+  redisClient.on('end', () => console.log('⚠️  Redis connection closed — falling back to direct DB reads'));
 
-(async () => {
-  try {
-    await redisClient.connect();
-  } catch (err) {
-    console.error('❌ Redis connect failed (OTP/cache will fallback to DB):', err.message);
-  }
-})();
+  (async () => {
+    try {
+      await redisClient.connect();
+    } catch (err) {
+      console.warn('⚠️  Redis connect failed (OTP & routes will query MySQL directly):', err.message);
+    }
+  })();
+} else {
+  console.log('ℹ️  Redis cache is disabled via CACHE_ENABLED=false');
+}
 
-module.exports = redisClient;
+// Fallback dummy object if Redis is disabled or uninitialized
+const fallbackClient = {
+  isOpen: false,
+  get: async () => null,
+  set: async () => false,
+  del: async () => false,
+  incr: async () => 0
+};
+
+module.exports = redisClient || fallbackClient;
