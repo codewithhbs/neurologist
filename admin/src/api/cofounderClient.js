@@ -3,7 +3,7 @@ import axios from 'axios';
 // Cofounder API is a separate base path (/api/cofounder) protected only by
 // a static secret key header — no login, no JWT.
 
-const baseURL = 'https://api.dentalhealthcareandimplantcentre.in/api/cofounder';
+const baseURL = 'https://api.drneerajkumarneurologist.com/api/cofounder';
 
 const cofounderClient = axios.create({ baseURL, timeout: 20000 });
 

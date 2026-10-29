@@ -272,7 +272,7 @@ export default function Appointments() {
 
       const publicBase =
         import.meta.env.VITE_API_URL?.replace("/admin", "") ||
-        "https://api.dentalhealthcareandimplantcentre.in/api";
+        "https://api.drneerajkumarneurologist.com/api";
 
       const params = new URLSearchParams({
         doctor_id: String(form.doctor_id),

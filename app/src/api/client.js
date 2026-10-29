@@ -2,9 +2,9 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 
-export const API_URL_DEV = "https://api.dentalhealthcareandimplantcentre.in/";
+export const API_URL_DEV = "https://api.drneerajkumarneurologist.com/";
 
-const API_URL = "https://api.dentalhealthcareandimplantcentre.in/api";
+const API_URL = "https://api.drneerajkumarneurologist.com/api";
 
 const client = axios.create({ baseURL: API_URL, timeout: 20000 });
 

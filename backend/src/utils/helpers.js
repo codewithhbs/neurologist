@@ -1,11 +1,11 @@
 const dayjs = require('dayjs');
 const slugify = require('slugify');
 
-// DHC + YYMM + Clinic short + running number, e.g. DHC2410S21001
+// APP + YYMM + Clinic short + running number, e.g. APP2410S21001
 const generateAppointmentCode = (clinicShortCode = 'S') => {
   const yymm = dayjs().format('YYMM');
   const rand = Math.floor(1000 + Math.random() * 9000);
-  return `DHC${yymm}${clinicShortCode}${rand}`;
+  return `APP${yymm}${clinicShortCode}${rand}`;
 };
 
 const makeSlug = (text) => slugify(text, { lower: true, strict: true });

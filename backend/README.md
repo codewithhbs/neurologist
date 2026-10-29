@@ -27,7 +27,7 @@ Node.js + Express + MySQL (mysql2) + Redis + Razorpay + Cloudinary backend.
    ```
    npm run dev
    ```
-   API on https://api.dentalhealthcareandimplantcentre.in
+   API on https://api.drneerajkumarneurologist.com
 
 ## OTP in dev mode
 `OTP_PROVIDER=console` in .env → OTP prints in terminal logs instead of sending real SMS. Plug in MSG91/Fast2SMS/Twilio in `src/utils/otp.js` → `sendOtpSms()` for production.
@@ -85,10 +85,10 @@ If Redis is unreachable the API keeps working — every request just falls throu
 
 **Verify it yourself**
 ```bash
-curl -i https://api.dentalhealthcareandimplantcentre.in/api/doctors | grep -i x-cache   # MISS
-curl -i https://api.dentalhealthcareandimplantcentre.in/api/doctors | grep -i x-cache   # HIT
+curl -i https://api.drneerajkumarneurologist.com/api/doctors | grep -i x-cache   # MISS
+curl -i https://api.drneerajkumarneurologist.com/api/doctors | grep -i x-cache   # HIT
 # now PUT /api/admin/doctors/1 from the admin panel
-curl -i https://api.dentalhealthcareandimplantcentre.in/api/doctors | grep -i x-cache   # MISS + new data
+curl -i https://api.drneerajkumarneurologist.com/api/doctors | grep -i x-cache   # MISS + new data
 ```
 
 ## Next

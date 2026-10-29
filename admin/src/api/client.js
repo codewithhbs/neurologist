@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.dentalhealthcareandimplantcentre.in/api/admin',
+  baseURL: import.meta.env.VITE_API_URL || 'https://api.drneerajkumarneurologist.com/api/admin',
   timeout: 20000
 });
 

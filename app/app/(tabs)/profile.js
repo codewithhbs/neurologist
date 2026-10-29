@@ -18,7 +18,7 @@ import Button from "../../src/components/Button";
 import { FamilyManager } from "../../src/components/FamilyMembers";
 import { relationLabel } from "../../src/utils/family";
 
-const API_BASE = "https://api.dentalhealthcareandimplantcentre.in";
+const API_BASE = "https://api.drneerajkumarneurologist.com";
 
 const TABS = [
   ["appointments", "Appts", "calendar-outline"],

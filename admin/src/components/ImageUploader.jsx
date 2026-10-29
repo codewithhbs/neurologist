@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { FiUpload, FiX, FiLoader } from 'react-icons/fi';
 import { getAdminToken } from '../api/client';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.dentalhealthcareandimplantcentre.in/api/admin';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://api.drneerajkumarneurologist.com/api/admin';
 
 /**
  * <ImageUploader value={form.photo_url} onChange={(url) => setForm({...form, photo_url: url})} folder="doctors" />

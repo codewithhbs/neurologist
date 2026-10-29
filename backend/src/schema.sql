@@ -219,7 +219,7 @@ CREATE TABLE offers (
 -- ---------------- APPOINTMENTS ----------------
 CREATE TABLE appointments (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  appointment_code VARCHAR(30) NOT NULL UNIQUE, -- e.g. DHC2410S21001
+  appointment_code VARCHAR(30) NOT NULL UNIQUE, -- e.g. APP2410S21001
   patient_id INT NOT NULL,
   clinic_id INT NOT NULL,
   doctor_id INT NOT NULL,

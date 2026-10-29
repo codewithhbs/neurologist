@@ -37,7 +37,7 @@ export default function Services() {
 
   useEffect(() => {
     client.get('/services').then((res) => setServices(res.data.services));
-    fetch(`${import.meta.env.VITE_API_URL?.replace('/admin', '') || 'https://api.dentalhealthcareandimplantcentre.in/api'}/services/categories/list`)
+    fetch(`${import.meta.env.VITE_API_URL?.replace('/admin', '') || 'https://api.drneerajkumarneurologist.com/api'}/services/categories/list`)
       .then((r) => r.json()).then((d) => setCategories(d.categories || [])).catch(() => { });
   }, []);
 
