@@ -24,7 +24,7 @@ export default function Header({ settings = {} }) {
   const phone = settings.phone || CLINIC.phone;
   const email = settings.email || CLINIC.email;
   const address = settings.address || CLINIC.address;
-  const logo = settings.logo_url || "/logo.png";
+  const logo = settings.logo_url || "https://api.drneerajkumarneurologist.com/uploads/logo/logo.png";
 
   useEffect(() => {
     setMounted(true);
