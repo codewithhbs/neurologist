@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import {
   FiUser,
@@ -9,10 +10,15 @@ import {
   FiAward,
   FiStar,
   FiArrowRight,
+  FiCheckCircle,
 } from 'react-icons/fi';
 import { FaBrain } from 'react-icons/fa';
 
-/* ---------- content data ---------- */
+/* ---------- Brand ---------- */
+
+const BLUE = '#2F6FC6';
+
+/* ---------- Content ---------- */
 
 const FEATURES = [
   {
@@ -48,90 +54,234 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { icon: FiAward, value: '24+', label: 'Years of experience', sub: 'In neurology' },
-  { icon: FiStar, value: '5.0/5', label: 'Patient rating', sub: 'Google Reviews' },
-  { icon: FaBrain, value: '13', label: 'Conditions treated', sub: 'Brain, nerve & spine' },
-  { icon: FiUsers, value: 'DM', label: 'Neurology', sub: 'Dr. RML Hospital, Delhi' },
+  {
+    icon: FiAward,
+    value: '24+',
+    label: 'Years of experience',
+    sub: 'In neurology',
+  },
+  {
+    icon: FiStar,
+    value: '5.0/5',
+    label: 'Patient rating',
+    sub: 'Google Reviews',
+  },
+  {
+    icon: FaBrain,
+    value: '13',
+    label: 'Conditions treated',
+    sub: 'Brain, nerve & spine',
+  },
+  {
+    icon: FiUsers,
+    value: 'DM',
+    label: 'Neurology',
+    sub: 'Dr. RML Hospital, Delhi',
+  },
 ];
+
+/* ---------- Component ---------- */
 
 export default function WhyChooseUs() {
   return (
-    <section className="bg-gradient-to-b from-brand-50/50 to-white py-10 sm:py-12 lg:py-16">
-      <div className="container-x">
-        {/* ---------- heading ---------- */}
-        <div className="grid gap-3 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-10 mb-6 sm:mb-8">
+    <section className="relative isolate overflow-hidden bg-[#F4F8FE] py-16 sm:py-20 lg:py-24">
+
+      {/* Background decorations */}
+      <div className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[500px] w-[500px] rounded-full bg-[#2F6FC6]/[0.06] blur-3xl" />
+
+      <div className="pointer-events-none absolute -bottom-40 -left-40 -z-10 h-[450px] w-[450px] rounded-full bg-blue-100/60 blur-3xl" />
+
+      <div className="container-x relative">
+
+        {/* ---------- Section Heading ---------- */}
+
+        <div className="mb-10 grid gap-5 lg:mb-12 lg:grid-cols-2 lg:items-end">
+
           <div>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 mb-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100">
-                <FaBrain className="text-xs" aria-hidden="true" />
+            <div className="mb-4 inline-flex items-center gap-2.5 rounded-full border border-[#2F6FC6]/15 bg-white px-4 py-2 shadow-sm">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#2F6FC6]/10 text-[#2F6FC6]">
+                <FaBrain size={14} />
               </span>
-              Why choose us
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight text-balance">
-              Because your brain deserves the best care
+
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#2F6FC6]">
+                Why Choose Us
+              </span>
+            </div>
+
+            <h2 className="max-w-xl text-3xl font-extrabold leading-[1.15] tracking-tight text-slate-950 sm:text-4xl lg:text-[2.8rem]">
+              Because Your Brain Deserves{' '}
+              <span className="text-[#2F6FC6]">
+                The Best Care
+              </span>
             </h2>
           </div>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed lg:max-w-md lg:justify-self-end">
-            Deep neurological expertise, careful diagnosis and genuine care, so you can get back to
-            living well.
-          </p>
-        </div>
 
-        {/* ---------- one joined panel: features + stats/CTA ---------- */}
-        <div className="grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[1fr_340px]">
-          {/* features - hairline grid made with gap-px */}
-          <ul className="grid grid-cols-1 gap-px bg-slate-200 sm:grid-cols-2">
-            {FEATURES.map(({ icon: Icon, title, desc }) => (
-              <li
-                key={title}
-                className="group flex gap-3 bg-white p-4 transition-colors hover:bg-brand-50/60 sm:p-5"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-600 group-hover:text-white group-hover:ring-brand-600">
-                  <Icon className="text-xl" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-base font-bold leading-snug text-slate-900">{title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="lg:justify-self-end lg:max-w-md lg:pb-1">
+            <p className="text-base leading-8 text-slate-600">
+              Deep neurological expertise, careful diagnosis and
+              genuine care, so you can get back to living well.
+            </p>
 
-          {/* stats + CTA */}
-          <div className="relative flex flex-col overflow-hidden bg-brand-gradient p-5 text-white sm:p-6">
-            <FaBrain
-              className="pointer-events-none absolute -bottom-6 -right-6 text-[150px] text-white/10"
-              aria-hidden="true"
-            />
-
-            <dl className="relative grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4 lg:grid-cols-2">
-              {STATS.map(({ icon: Icon, value, label, sub }) => (
-                <div key={label} className="min-w-0">
-                  <dt className="sr-only">{label}</dt>
-                  <Icon className="mb-1 text-lg text-white/70" aria-hidden="true" />
-                  <dd className="text-2xl font-extrabold leading-none sm:text-[1.75rem]">
-                    {value}
-                  </dd>
-                  <p className="mt-1 text-sm font-semibold leading-snug">{label}</p>
-                  <p className="text-xs leading-snug text-white/75">{sub}</p>
-                </div>
-              ))}
-            </dl>
-
-            <div className="relative mt-5 flex flex-col gap-3 border-t border-white/25 pt-5 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-start lg:justify-start">
-              <div>
-                <p className="text-base font-bold leading-snug">Need a neurology consultation?</p>
-                <p className="text-sm text-white/85">Book your appointment today.</p>
-              </div>
-              <Link
-                href="/appointment?step=1&pay=clinic"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
-              >
-                Book appointment <FiArrowRight aria-hidden="true" />
-              </Link>
+            <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-[#2F6FC6]">
+              <FiCheckCircle size={17} />
+              <span>Your health is our priority</span>
             </div>
           </div>
+
         </div>
+
+        {/* ---------- Main Layout ---------- */}
+
+        <div className="grid overflow-hidden rounded-[2rem] border border-[#2F6FC6]/10 bg-white shadow-[0_15px_60px_rgba(47,111,198,0.08)] lg:grid-cols-[1fr_340px]">
+
+          {/* ---------- Features ---------- */}
+
+          <div className="p-4 sm:p-6 lg:p-8">
+
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900">
+                  The Care You Deserve
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  Experience the difference in neurological care.
+                </p>
+              </div>
+
+              <span className="hidden rounded-full bg-[#2F6FC6]/10 px-3 py-1.5 text-xs font-bold text-[#2F6FC6] sm:inline-flex">
+                Patient First
+              </span>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+
+              {FEATURES.map(({ icon: Icon, title, desc }, index) => (
+                <div
+                  key={title}
+                  className="group relative flex gap-4 rounded-2xl border border-slate-100 bg-[#F8FAFE] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-[#2F6FC6]/25 hover:bg-white hover:shadow-[0_12px_30px_rgba(47,111,198,0.09)] sm:p-5"
+                >
+
+                  {/* Icon */}
+                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-[#2F6FC6]/10 bg-white text-[#2F6FC6] shadow-sm transition-all duration-300 group-hover:border-[#2F6FC6] group-hover:bg-[#2F6FC6] group-hover:text-white">
+                    <Icon size={21} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-[14px] font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-[#2F6FC6] sm:text-[15px]">
+                        {title}
+                      </h4>
+                    </div>
+
+                    <p className="mt-2 text-[12px] leading-[1.8] text-slate-600 sm:text-[13px]">
+                      {desc}
+                    </p>
+                  </div>
+
+                  {/* Hover indicator */}
+                  <span className="absolute bottom-0 left-5 right-5 h-[2px] origin-left scale-x-0 rounded-full bg-[#2F6FC6] transition-transform duration-300 group-hover:scale-x-100" />
+
+                </div>
+              ))}
+
+            </div>
+          </div>
+
+          {/* ---------- Stats Sidebar ---------- */}
+
+          <aside className="relative isolate flex flex-col overflow-hidden bg-gradient-to-br from-[#245BA5] via-[#2F6FC6] to-[#167FBF] p-6 text-white sm:p-8 lg:p-7">
+
+            {/* Decorative elements */}
+            <div className="pointer-events-none absolute -right-16 -top-16 -z-10 h-56 w-56 rounded-full border-[30px] border-white/[0.07]" />
+
+            <div className="pointer-events-none absolute -bottom-16 -right-12 -z-10 text-[190px] text-white/[0.07]">
+              <FaBrain />
+            </div>
+
+            {/* Sidebar Heading */}
+            <div className="mb-7">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white/90">
+                <FiAward size={13} />
+                Our Expertise
+              </span>
+
+              <h3 className="mt-4 text-2xl font-extrabold leading-tight">
+                Trusted Care.
+                <br />
+                Proven Experience.
+              </h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-white/75">
+                Dedicated to providing quality neurological care.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-7">
+
+              {STATS.map(({ icon: Icon, value, label, sub }) => (
+                <div key={label} className="min-w-0">
+
+                  <dt className="sr-only">{label}</dt>
+
+                  <Icon
+                    size={19}
+                    className="mb-2 text-white/70"
+                  />
+
+                  <dd className="text-3xl font-extrabold tracking-tight">
+                    {value}
+                  </dd>
+
+                  <p className="mt-1 text-[12px] font-bold leading-snug text-white">
+                    {label}
+                  </p>
+
+                  <p className="mt-1 text-[11px] leading-snug text-white/65">
+                    {sub}
+                  </p>
+
+                </div>
+              ))}
+
+            </dl>
+
+            {/* CTA */}
+            <div className="mt-auto pt-8">
+
+              <div className="mb-5 h-px w-full bg-white/20" />
+
+              <p className="text-base font-extrabold">
+                Need a neurology consultation?
+              </p>
+
+              <p className="mt-1 text-sm text-white/75">
+                Take the first step towards better health.
+              </p>
+
+              <Link
+                href="/appointment?step=1&pay=clinic"
+                className="group mt-5 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-[#245BA5] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#F0F6FF] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              >
+                Book Appointment
+
+                <FiArrowRight
+                  size={18}
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </Link>
+
+              <p className="mt-3 text-center text-[11px] text-white/60">
+                Monday – Saturday · 6:00 PM – 8:00 PM
+              </p>
+
+            </div>
+
+          </aside>
+
+        </div>
+
       </div>
     </section>
   );

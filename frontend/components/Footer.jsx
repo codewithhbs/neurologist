@@ -51,57 +51,155 @@ export default function Footer({ settings = {} }) {
   return (
     <>
       {/* ================= CTA STRIP ================= */}
-      <section className="relative bg-brand-900 text-white overflow-hidden">
+      <section className="relative isolate overflow-hidden bg-[#0B2A5B] text-white">
         <div
-          className="absolute inset-0 opacity-[0.07]"
+          className="absolute inset-0 -z-10 opacity-[0.07]"
           style={{
             backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
             backgroundSize: "24px 24px",
           }}
         />
-        <div className="absolute -top-32 -right-20 w-80 h-80 rounded-full bg-accent-500/25 blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 w-80 h-80 rounded-full bg-brand-500/25 blur-3xl" />
-        <FaBrain className="hidden lg:block absolute bottom-4 right-24 text-[170px] text-white/[0.06]" aria-hidden="true" />
+        <div className="absolute -left-32 -top-32 -z-10 h-96 w-96 rounded-full bg-[#2F6FC6]/40 blur-3xl" />
+        <div className="absolute -bottom-40 right-0 -z-10 h-96 w-96 rounded-full bg-sky-400/20 blur-3xl" />
+        <FaBrain
+          aria-hidden="true"
+          className="absolute -bottom-16 left-1/3 -z-10 hidden text-[320px] text-white/[0.04] lg:block"
+        />
 
-        <div className="container-x relative py-14 grid md:grid-cols-2 gap-10 items-center">
+        <div className="container-x grid items-center gap-10 py-14 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:py-20">
+          {/* LEFT */}
           <div>
-            <p className="section-eyebrow text-accent-300 mb-2">Get In Touch</p>
-            <h2 className="text-2xl lg:text-3xl font-bold mb-3">
-              Have a Question? We&apos;re Here to Help!
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold backdrop-blur">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              </span>
+              Now booking consultations
+            </span>
+
+            <h2 className="mt-5 text-3xl font-extrabold leading-[1.12] tracking-tight sm:text-4xl lg:text-[2.9rem]">
+              Have a Question?
+              <br />
+              <span className="bg-gradient-to-r from-sky-300 to-white bg-clip-text text-transparent">
+                We&apos;re Here to Help!
+              </span>
             </h2>
-            <p className="text-brand-100/80 mb-6">
-              Call us or WhatsApp us to book your consultation with Dr Neeraj Kumar.
+
+            <p className="mt-4 max-w-lg text-sm leading-7 text-white/75 sm:text-base">
+              Call us or WhatsApp us to book your consultation with Dr Neeraj
+              Kumar. We usually reply within minutes.
             </p>
 
-            <div className="flex items-start gap-3 border-t border-white/10 pt-5">
-              <FiCalendar className="text-accent-300 mt-0.5 shrink-0" />
-              <div className="text-sm text-brand-100/80 space-y-1">
-                <p>
-                  <strong className="text-white font-medium">Monday–Saturday:</strong>{" "}
-                  6:00 PM–8:00 PM
-                </p>
-                <p>
-                  <strong className="text-white font-medium">Sunday:</strong> Closed
-                </p>
-              </div>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <a
+                href={`tel:+91${phone}`}
+                className="group relative overflow-hidden rounded-2xl bg-white p-4 text-[#133E82] shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#2F6FC6] text-white">
+                    <FiPhoneCall
+                      size={20}
+                      className="transition-transform duration-300 group-hover:rotate-12"
+                    />
+                  </span>
+                  <span className="leading-tight">
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      Call Now
+                    </span>
+                    <span className="text-lg font-extrabold">+91 {phone}</span>
+                  </span>
+                </span>
+              </a>
+
+              <a
+                href={`https://wa.me/${whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden rounded-2xl bg-[#25D366] p-4 text-white shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#1FBF5B]"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/20">
+                    <FaWhatsapp size={24} />
+                  </span>
+                  <span className="leading-tight">
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-white/80">
+                      WhatsApp
+                    </span>
+                    <span className="text-lg font-extrabold">Chat With Us</span>
+                  </span>
+                </span>
+              </a>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:justify-end">
-            <a
-              href={`tel:+91${phone}`}
-              className="group flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-6 py-3.5 rounded-xl text-center transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              <FiPhoneCall className="transition-transform group-hover:rotate-12" /> {phone}
-            </a>
-            <a
-              href={`https://wa.me/${whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 font-semibold px-6 py-3.5 rounded-xl text-center transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              <FaWhatsapp /> Chat on WhatsApp
-            </a>
+          {/* RIGHT: schedule card */}
+          <div className="relative">
+            <div className="absolute -inset-3 -z-10 rounded-[2rem] bg-gradient-to-br from-sky-400/30 to-transparent blur-xl" />
+            <div className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl shadow-black/25 backdrop-blur-md sm:p-8">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/15 text-sky-200">
+                    <FiCalendar size={20} />
+                  </span>
+                  <div className="leading-tight">
+                    <p className="text-sm font-bold">Clinic Schedule</p>
+                    <p className="text-xs text-white/60">
+                      Dr Neeraj Kumar · Neurologist
+                    </p>
+                  </div>
+                </div>
+                <FiShield className="text-sky-300" size={20} />
+              </div>
+
+              {/* week strip */}
+              <div className="mt-6 grid grid-cols-7 gap-2">
+                {[
+                  ["M", true],
+                  ["T", true],
+                  ["W", true],
+                  ["T", true],
+                  ["F", true],
+                  ["S", true],
+                  ["S", false],
+                ].map(([d, open], i) => (
+                  <div
+                    key={i}
+                    className={`flex flex-col items-center gap-1.5 rounded-xl py-3 text-xs font-bold ${
+                      open
+                        ? "bg-white text-[#133E82] shadow-md"
+                        : "border border-dashed border-white/25 text-white/40"
+                    }`}
+                  >
+                    {d}
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        open ? "bg-emerald-500" : "bg-white/30"
+                      }`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/10 pt-5">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-white/55">
+                    Monday – Saturday
+                  </p>
+                  <p className="mt-1 flex items-center gap-2 text-2xl font-extrabold">
+                    <FiClock className="text-sky-300" size={20} />
+                    6:00 – 8:00 PM
+                  </p>
+                </div>
+                <p className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">
+                  Sunday closed
+                </p>
+              </div>
+
+              <p className="mt-4 flex items-center gap-2 text-xs text-white/60">
+                <FiMapPin size={13} className="text-sky-300" />
+                Vasant Kunj, New Delhi
+              </p>
+            </div>
           </div>
         </div>
       </section>
